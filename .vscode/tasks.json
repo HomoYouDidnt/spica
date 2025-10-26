@@ -48,6 +48,11 @@
       "label": "promotion: build (sample)",
       "type": "shell",
       "command": "python tools/build_promotion_unit.py --variant-id spica_dev --baseline-id prod_2025-10-20 --pipeline configs/pipelines/local.yaml --metrics shadow.metrics.json --datasets '{\"gold\":\"samples/sanitized.qarg.jsonl\",\"fresh\":\"samples/sanitized.qarg.jsonl\"}' --guardrails '{\"kl_persona\":0.01,\"kl_task\":0.04,\"violations\":0}' --mutation-vector '[]' --env-hash dev --out promotion_unit.json"
+    },
+    {
+      "label": "baseline (gold)",
+      "type": "shell",
+      "command": "python tools/shadow_runner.py --pipeline configs/pipelines/local.yaml --input samples/gold.qarg.jsonl --out baseline.shadow.metrics.json --limit 10000"
     }
   ]
 }
