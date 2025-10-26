@@ -72,17 +72,29 @@
     {
       "label": "queue: demo",
       "type": "shell",
-      "command": "uv run python -c \"from tools.queue_runner import QueueRunner; q=QueueRunner(); q.submit('eval:shadow@gold', lambda: None, 10); q.submit('explore:mutate@1', lambda: None, 1); q.run(5.0)\""
+      "command": "uv run python",
+      "args": [
+        "-c",
+        "from tools.queue_runner import QueueRunner; q=QueueRunner(); q.submit('eval:shadow@gold', lambda: None, 10); q.submit('explore:mutate@1', lambda: None, 1); q.run(5.0)"
+      ]
     },
     {
       "label": "queue: shadow (sample)",
       "type": "shell",
-      "command": "uv run python -c \"from tools.queue_runner import QueueRunner, submit_shadow_job; q=QueueRunner(); submit_shadow_job(q,name='eval:shadow@sample',pipeline='configs/pipelines/local.yaml',input_path='samples/sanitized.qarg.jsonl',out_path='shadow.metrics.json',limit=1000,priority=10); q.run(60)\""
+      "command": "uv run python",
+      "args": [
+        "-c",
+        "from tools.queue_runner import QueueRunner, submit_shadow_job; q=QueueRunner(); submit_shadow_job(q,name='eval:shadow@sample',pipeline='configs/pipelines/local.yaml',input_path='samples/sanitized.qarg.jsonl',out_path='shadow.metrics.json',limit=1000,priority=10); q.run(60)"
+      ]
     },
     {
       "label": "queue: baseline+fresh",
       "type": "shell",
-      "command": "uv run python -c \"from tools.queue_runner import QueueRunner, submit_dual_shadow_jobs; q=QueueRunner(); submit_dual_shadow_jobs(q,pipeline='configs/pipelines/local.yaml',gold_input='samples/gold.qarg.jsonl',fresh_input='samples/sanitized.qarg.jsonl'); q.run(180)\""
+      "command": "uv run python",
+      "args": [
+        "-c",
+        "from tools.queue_runner import QueueRunner, submit_dual_shadow_jobs; q=QueueRunner(); submit_dual_shadow_jobs(q,pipeline='configs/pipelines/local.yaml',gold_input='samples/gold.qarg.jsonl',fresh_input='samples/sanitized.qarg.jsonl'); q.run(180)"
+      ]
     },
     {
       "label": "promotion: candidate (queue)",
