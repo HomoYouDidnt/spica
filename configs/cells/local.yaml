@@ -1,0 +1,9 @@
+cells:
+  - id: echo
+    module: spica.cells.echo
+    entry: run
+    manifest_attr: MANIFEST
+
+pipeline:
+  - echo
+
