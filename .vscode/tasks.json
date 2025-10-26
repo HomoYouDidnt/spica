@@ -53,6 +53,26 @@
       "label": "baseline (gold)",
       "type": "shell",
       "command": "python tools/shadow_runner.py --pipeline configs/pipelines/local.yaml --input samples/gold.qarg.jsonl --out baseline.shadow.metrics.json --limit 10000"
+    },
+    {
+      "label": "pipeline: activate (tags)",
+      "type": "shell",
+      "command": "python tools/kill_switch.py --activate --target configs/pipelines/tags.yaml"
+    },
+    {
+      "label": "pipeline: rollback (baseline)",
+      "type": "shell",
+      "command": "python tools/kill_switch.py --deactivate"
+    },
+    {
+      "label": "promotion: candidate (gold+fresh)",
+      "dependsOn": ["shadow (sample)", "promotion: build (sample)"],
+      "dependsOrder": "sequence"
+    },
+    {
+      "label": "queue: demo",
+      "type": "shell",
+      "command": "python -c \"from tools.queue_runner import QueueRunner; q=QueueRunner(); q.submit('eval:shadow@gold', lambda: None, 10); q.submit('explore:mutate@1', lambda: None, 1); q.run(5.0)\""
     }
   ]
 }

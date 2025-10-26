@@ -216,6 +216,17 @@ Promotion guard fails?
 - PR is labeled `promotion`.
 - If the unit was modified post-signing, rebuild it.
 
+### QueueRunner (eval > explore)
+A tiny priority queue for orchestration. Use higher priorities for evaluation jobs so they finish before exploration:
+
+```python
+from tools.queue_runner import QueueRunner
+qr = QueueRunner()
+qr.submit("eval:shadow@gold", lambda: None, priority=10)
+qr.submit("explore:mutate@1",  lambda: None, priority=1)
+qr.run(budget_s=30.0)
+```
+
 
 
 
