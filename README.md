@@ -240,6 +240,18 @@ submit_shadow_job(qr, name="eval:shadow@gold",
 qr.run(budget_s=60.0)
 ```
 
+Queue both gold (baseline) and fresh replays:
+
+```python
+from tools.queue_runner import QueueRunner, submit_dual_shadow_jobs
+q = QueueRunner()
+submit_dual_shadow_jobs(q,
+  pipeline="configs/pipelines/local.yaml",
+  gold_input="samples/gold.qarg.jsonl",
+  fresh_input="samples/sanitized.qarg.jsonl")
+q.run(budget_s=120.0)
+```
+
 
 
 

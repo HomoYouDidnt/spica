@@ -113,3 +113,47 @@ def submit_shadow_job(
         subprocess.check_call(cmd)
 
     runner.submit(name, _job, priority=priority)
+
+
+def submit_dual_shadow_jobs(
+    runner: QueueRunner,
+    *,
+    pipeline: str,
+    gold_input: str,
+    fresh_input: str,
+    gold_out: str = "baseline.shadow.metrics.json",
+    fresh_out: str = "shadow.metrics.json",
+    baseline_for_fresh: str | None = None,
+    gold_limit: int = 10000,
+    fresh_limit: int = 1000,
+    gold_priority: int = 12,
+    fresh_priority: int = 10,
+    python_exe: str | None = None,
+) -> None:
+    """Enqueue gold (baseline) then fresh replays in priority order.
+
+    Gold runs first at higher priority to generate/update the baseline. Fresh
+    then runs with the baseline (either provided or the gold output path).
+    """
+    submit_shadow_job(
+        runner,
+        name="eval:shadow@gold",
+        pipeline=pipeline,
+        input_path=gold_input,
+        out_path=gold_out,
+        baseline=None,
+        limit=gold_limit,
+        priority=gold_priority,
+        python_exe=python_exe or sys.executable,
+    )
+    submit_shadow_job(
+        runner,
+        name="eval:shadow@fresh",
+        pipeline=pipeline,
+        input_path=fresh_input,
+        out_path=fresh_out,
+        baseline=baseline_for_fresh or gold_out,
+        limit=fresh_limit,
+        priority=fresh_priority,
+        python_exe=python_exe or sys.executable,
+    )
