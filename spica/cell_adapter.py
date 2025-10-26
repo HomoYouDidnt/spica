@@ -2,6 +2,7 @@ import os
 import time
 from typing import Any, Callable, Dict, Optional
 
+from .config import tau_task_for_domain
 from .contracts import validate_manifest
 from .metrics import RunMetrics, Stopwatch
 from .safety import SafetyViolation, kl_persona, kl_task
@@ -45,7 +46,8 @@ class CellAdapter:
 
         # Safety thresholds from env
         tau_persona = float(os.environ.get("SPICA_TAU_PERSONA", 0.02))
-        tau_task = float(os.environ.get("SPICA_TAU_TASK", 0.08))
+        # choose per-domain tau_task (fallbacks internally to global/default)
+        tau_t_eff = tau_task_for_domain(context.get("domain"))
 
         # Estimate tokens for inputs and enforce token budget by incrementing context
         in_tokens = estimate_tokens(inputs)
@@ -167,7 +169,7 @@ class CellAdapter:
                     "seed": context.get("seed"),
                     "kl_persona": k_persona,
                     "kl_task": k_task,
-                    "tau_task": tau_task,
+                    "tau_task": tau_t_eff,
                     "tau_persona": tau_persona,
                     "budgets_used": {
                         "tokens_used": context.get("tokens_used"),
@@ -192,7 +194,7 @@ class CellAdapter:
                     "kl_persona": k_persona,
                     "kl_task": k_task,
                     "tau_persona": tau_persona,
-                    "tau_task": tau_task,
+                    "tau_task": tau_t_eff,
                     "tokens_used": context.get("tokens_used"),
                 }
             )
