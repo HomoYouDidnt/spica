@@ -31,3 +31,14 @@ def test_uppercase_then_echo_pipeline_metrics():
     assert "uppercase" in metrics_log
     assert metrics_log["uppercase"]["ok"] is True
     assert metrics_log["uppercase"]["latency_ms"] >= 0.0
+
+
+def test_ranker_selects_overlap():
+    from spica.cell_adapter import CellAdapter
+    from spica.cells.ranker import MANIFEST, run
+
+    c = CellAdapter(run, MANIFEST)
+    out = c.run(
+        {"run_id": "t"}, candidates=["hello spica", "goodnight moon"], query="hello"
+    )
+    assert out["selected"] == ["hello spica"]

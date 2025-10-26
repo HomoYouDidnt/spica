@@ -9,6 +9,12 @@ cells:
     entry: run
     manifest_attr: MANIFEST
 
+  - id: rank
+    module: spica.cells.ranker
+    entry: run
+    manifest_attr: MANIFEST
+
 pipeline:
   - upper
   - echo
+  - rank

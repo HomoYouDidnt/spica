@@ -22,3 +22,23 @@ def mutate_mode(manifest: Dict, new_mode: str) -> Dict:
     res["mode"] = new_mode
     m["resources"] = res
     return m
+
+
+def mutate_decoding(
+    params: dict,
+    *,
+    temp_bounds=(0.1, 1.2),
+    topk_bounds=(1, 100),
+    topp_bounds=(0.1, 1.0),
+) -> dict:
+    """Clamp-and-tweak decoding params; fields optional."""
+    out = dict(params or {})
+    if "temperature" in out:
+        out["temperature"] = min(
+            max(out["temperature"] * 0.9, temp_bounds[0]), temp_bounds[1]
+        )
+    if "top_k" in out:
+        out["top_k"] = int(min(max(out["top_k"] + 1, topk_bounds[0]), topk_bounds[1]))
+    if "top_p" in out:
+        out["top_p"] = min(max(out["top_p"] + 0.05, topp_bounds[0]), topp_bounds[1])
+    return out

@@ -1,6 +1,6 @@
 import pytest
 
-from spica.variation.operators import mutate_mode, swap_two
+from spica.variation.operators import mutate_decoding, mutate_mode, swap_two
 
 
 def test_swap_two_basic():
@@ -15,3 +15,10 @@ def test_mutate_mode_in_manifest():
     assert m2["resources"]["mode"] == "fast"
     assert "mode" not in m["resources"]
 
+
+def test_mutate_decoding_clamps_and_tweaks():
+    p = {"temperature": 1.5, "top_k": 0, "top_p": 0.05}
+    m = mutate_decoding(p)
+    assert 0.1 <= m["temperature"] <= 1.2
+    assert 1 <= m["top_k"] <= 100
+    assert 0.1 <= m["top_p"] <= 1.0
