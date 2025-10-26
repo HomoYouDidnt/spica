@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "SPICA Demo (cells/local.yaml)",
+      "type": "python",
+      "request": "launch",
+      "module": "spica.demo",
+      "args": ["--cells", "configs/cells/local.yaml"],
+      "console": "integratedTerminal",
+      "env": {
+        "CUDA_VISIBLE_DEVICES": ""
+      }
+    },
+    {
+      "name": "Tests: nearest function",
+      "type": "python",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["-q", "tests/test_cells.py::TestCellAdapter::test_adapter_happy_path"],
+      "console": "integratedTerminal"
+    }
+  ]
+}
