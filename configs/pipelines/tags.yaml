@@ -1,0 +1,5 @@
+steps:
+  - select_by_tag: ["transform"]
+  - name: echo
+  - select_by_tag: ["rank"]
+
