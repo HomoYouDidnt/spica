@@ -38,6 +38,78 @@ And then visit the URL shown. Make sure to access it correctly, e.g. on Lambda u
 
 ---
 
+## SPICA — Run / Shadow / Promote (Quickstart)
+
+1) Run (local sanity)
+```
+python -m spica.demo --pipeline configs/pipelines/local.yaml
+```
+
+2) Shadow (offline replay)
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --out shadow.metrics.json --limit 1000
+```
+
+3) Promote (build signed bundle)
+```
+# set a dev key locally (in CI, set Actions secret SPICA_PROMOTION_KEY)
+$env:SPICA_PROMOTION_KEY="DEV_ONLY_NOT_SECURE_KEY_change_me"   # PowerShell
+# export SPICA_PROMOTION_KEY=DEV_ONLY_NOT_SECURE_KEY_change_me  # bash
+
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/sanitized.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+```
+
+4) PR Gate (CI)
+
+Add label `promotion` to the PR; CI will verify `promotion_unit.json` using the repo secret `SPICA_PROMOTION_KEY`.
+
+---
+
+### One-time repo setup (GitHub UI)
+
+1) Add secret: Settings → Secrets and variables → Actions → New repository secret
+   - Name: `SPICA_PROMOTION_KEY`
+   - Value: random 32+ byte string (e.g., `openssl rand -hex 32`)
+
+2) Ensure workflow perms: Settings → Actions → General
+   - Actions permissions: Allow all actions and reusable workflows
+   - Workflow permissions: Read and write permissions (if later needed)
+
+---
+
+### Local smoke before opening the PR
+
+```
+# 1) Build shadow metrics (sample)
+python tools/shadow_runner.py --pipeline configs/pipelines/local.yaml --input samples/sanitized.qarg.jsonl --out shadow.metrics.json --limit 100
+
+# 2) Build promotion bundle (dev key)
+# PowerShell:
+$env:SPICA_PROMOTION_KEY="DEV_ONLY_NOT_SECURE_KEY_change_me"
+# bash:
+# export SPICA_PROMOTION_KEY=DEV_ONLY_NOT_SECURE_KEY_change_me
+
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/sanitized.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+
+# 3) Verify locally (should exit 0)
+python -c "from spica.promotions import verify_promotion_unit as v; import sys; sys.exit(0 if v('promotion_unit.json') else 1)"
+```
+
 You can also `cat report.md` file which appeared in the project directory and contains the "report card" of the run, i.e. a bunch of evaluations and metrics. At the very end, you'll see a summary table, for example:
 
 ---
