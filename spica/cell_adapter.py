@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from .contracts import ContractError, validate_manifest
+from .contracts import validate_manifest
 
 
 class CellAdapter:
@@ -11,4 +11,3 @@ class CellAdapter:
     def run(self, context: Dict[str, Any], **inputs):
         # Optional: enforce input names from manifest
         return self.impl(context=context, **inputs)
-

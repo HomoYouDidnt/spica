@@ -11,8 +11,7 @@ class CellManifest:
     risk_class: str = "low"
 
 
-class ContractError(Exception):
-    ...
+class ContractError(Exception): ...
 
 
 def validate_manifest(m: Dict[str, Any]) -> CellManifest:
@@ -27,4 +26,3 @@ def validate_manifest(m: Dict[str, Any]) -> CellManifest:
         outputs=m.get("outputs", []),
         risk_class=m.get("governance", {}).get("risk_class", "low"),
     )
-

@@ -8,4 +8,3 @@ MANIFEST = {
 
 def run(context, text: str) -> dict:
     return {"text": text}
-
