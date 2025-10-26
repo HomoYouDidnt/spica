@@ -1,0 +1,150 @@
+{
+  "system": "SPICA",
+  "version": "1.0.0",
+  "purpose": "Safe, auditable cognitive evolution under D-REAM",
+  "architecture": {
+    "core": {
+      "capability_registry": {
+        "path": "spica/capability_registry.py",
+        "inputs": ["capability_registry.json"],
+        "outputs": ["callables", "schemas", "budgets"],
+        "dependencies": [],
+        "emits": ["capability_map"]
+      },
+      "cell_adapter": {
+        "path": "spica/cell_adapter.py",
+        "inputs": ["pipeline_context", "capability_map"],
+        "outputs": ["metrics", "telemetry_events"],
+        "dependencies": ["spica/safety.py", "spica/tokenizer.py"],
+        "emits": ["RunMetrics", "TelemetryEvent"]
+      },
+      "safety": {
+        "path": "spica/safety.py",
+        "inputs": ["persona_embeddings", "task_embeddings"],
+        "outputs": ["kl_persona", "kl_task", "SafetyViolation"],
+        "dependencies": [],
+        "emits": ["drift_metrics"]
+      },
+      "tokenizer": {
+        "path": "spica/tokenizer.py",
+        "inputs": ["raw_inputs"],
+        "outputs": ["token_estimates"],
+        "dependencies": [],
+        "emits": ["tokens_used"]
+      },
+      "telemetry": {
+        "path": "spica/telemetry.py",
+        "inputs": ["metrics", "context"],
+        "outputs": ["spica.telemetry.jsonl"],
+        "dependencies": [],
+        "emits": ["telemetry_trace"]
+      },
+      "pipelines": {
+        "path": "spica/pipelines/registry.py",
+        "inputs": ["configs/pipelines/*.yaml", "capability_registry.json"],
+        "outputs": ["pipeline_graph"],
+        "dependencies": ["spica/cell_adapter.py"],
+        "emits": ["PipelineSpec"]
+      }
+    },
+    "evaluation": {
+      "shadow_runner": {
+        "path": "tools/shadow_runner.py",
+        "inputs": ["pipeline_graph", "samples/*.jsonl"],
+        "outputs": ["shadow.metrics.json"],
+        "dependencies": ["spica/pipelines/registry.py", "spica/cell_adapter.py"],
+        "emits": ["evaluation_metrics", "ci_delta"]
+      },
+      "queue_runner": {
+        "path": "tools/queue_runner.py",
+        "inputs": ["queued_jobs"],
+        "outputs": ["completed_jobs", "logs"],
+        "dependencies": ["tools/shadow_runner.py"],
+        "emits": ["priority_schedule", "budget_report"]
+      }
+    },
+    "promotion": {
+      "promotion_builder": {
+        "path": "tools/build_promotion_unit.py",
+        "inputs": ["shadow.metrics.json", "baseline.shadow.metrics.json", "datasets"],
+        "outputs": ["promotion_unit.json"],
+        "dependencies": ["spica/promotions.py"],
+        "emits": ["signed_bundle"]
+      },
+      "promotions_core": {
+        "path": "spica/promotions.py",
+        "inputs": ["promotion_unit.json"],
+        "outputs": ["HMAC_signature", "verification_report"],
+        "dependencies": [],
+        "emits": ["promotion_unit_verified"]
+      },
+      "promotion_guard": {
+        "path": ".github/workflows/promotion-guard.yml",
+        "inputs": ["promotion_unit.json"],
+        "outputs": ["CI_status"],
+        "dependencies": ["repo_secret:SPICA_PROMOTION_KEY"],
+        "emits": ["promotion_gate_passed"]
+      }
+    },
+    "operations": {
+      "kill_switch": {
+        "path": "tools/kill_switch.py",
+        "inputs": ["configs/pipelines/*"],
+        "outputs": ["current.yaml", "rollback_state"],
+        "dependencies": [],
+        "emits": ["active_pipeline"]
+      },
+      "config": {
+        "path": "spica/config.py",
+        "inputs": ["environment_variables"],
+        "outputs": ["tau_task_effective"],
+        "dependencies": [],
+        "emits": ["domain_overrides"]
+      }
+    },
+    "artifacts": {
+      "inputs": [
+        "samples/gold.qarg.jsonl",
+        "samples/sanitized.qarg.jsonl"
+      ],
+      "outputs": [
+        "shadow.metrics.json",
+        "baseline.shadow.metrics.json",
+        "promotion_unit.json",
+        "spica.telemetry.jsonl"
+      ],
+      "temporary": [
+        "spica.telemetry.jsonl",
+        "shadow.logs.tmp"
+      ]
+    }
+  },
+  "governance": {
+    "promotion_policy": {
+      "evidence_required": true,
+      "signature_required": true,
+      "rollback_supported": true
+    },
+    "safety_thresholds": {
+      "kl_persona": 0.02,
+      "kl_task_default": 0.08,
+      "domain_overrides": "SPICA_TAU_TASK__<DOMAIN>"
+    },
+    "budgets": {
+      "tokens_default": 64,
+      "sec_default": 5.0
+    }
+  },
+  "promotion_pipeline": [
+    "validate",
+    "run demo",
+    "shadow (sample)",
+    "baseline (gold)",
+    "queue: baseline+fresh",
+    "promotion: build (sample)",
+    "promotion: candidate (queue)",
+    "promotion guard CI",
+    "pipeline: activate"
+  ]
+}
+
