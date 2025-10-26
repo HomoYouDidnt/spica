@@ -38,6 +38,187 @@ And then visit the URL shown. Make sure to access it correctly, e.g. on Lambda u
 
 ---
 
+## SPICA — Run / Shadow / Promote (Quickstart)
+
+1) Run (local sanity)
+```
+python -m spica.demo --pipeline configs/pipelines/local.yaml
+```
+
+2) Shadow (offline replay)
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --out shadow.metrics.json --limit 1000
+```
+
+3) Promote (build signed bundle)
+```
+# set a dev key locally (in CI, set Actions secret SPICA_PROMOTION_KEY)
+$env:SPICA_PROMOTION_KEY="DEV_ONLY_NOT_SECURE_KEY_change_me"   # PowerShell
+# export SPICA_PROMOTION_KEY=DEV_ONLY_NOT_SECURE_KEY_change_me  # bash
+
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/sanitized.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+```
+
+4) PR Gate (CI)
+
+Add label `promotion` to the PR; CI will verify `promotion_unit.json` using the repo secret `SPICA_PROMOTION_KEY`.
+
+---
+
+### One-time repo setup (GitHub UI)
+
+1) Add secret: Settings → Secrets and variables → Actions → New repository secret
+   - Name: `SPICA_PROMOTION_KEY`
+   - Value: random 32+ byte string (e.g., `openssl rand -hex 32`)
+
+2) Ensure workflow perms: Settings → Actions → General
+   - Actions permissions: Allow all actions and reusable workflows
+   - Workflow permissions: Read and write permissions (if later needed)
+
+---
+
+### Local smoke before opening the PR
+
+```
+# 1) Build shadow metrics (sample)
+python tools/shadow_runner.py --pipeline configs/pipelines/local.yaml --input samples/sanitized.qarg.jsonl --out shadow.metrics.json --limit 100
+
+# 2) Build promotion bundle (dev key)
+# PowerShell:
+$env:SPICA_PROMOTION_KEY="DEV_ONLY_NOT_SECURE_KEY_change_me"
+# bash:
+# export SPICA_PROMOTION_KEY=DEV_ONLY_NOT_SECURE_KEY_change_me
+
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/sanitized.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+
+# 3) Verify locally (should exit 0)
+python -c "from spica.promotions import verify_promotion_unit as v; import sys; sys.exit(0 if v('promotion_unit.json') else 1)"
+```
+
+### Baseline from Gold Shard
+Create a stable baseline for Δacc@1 CIs:
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/gold.qarg.jsonl \
+  --out baseline.shadow.metrics.json \
+  --limit 10000
+```
+
+Use it in evaluations:
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --baseline baseline.shadow.metrics.json \
+  --out shadow.metrics.json --limit 1000
+```
+
+### From Baseline to Promotion
+
+Once a stable baseline exists, every promotion candidate should:
+
+1) Shadow on fresh data (with baseline for Δ and CI):
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --baseline baseline.shadow.metrics.json \
+  --out shadow.metrics.json --limit 1000
+```
+
+2) Build a signed bundle (evidence):
+
+```
+# local dev key; in CI use Actions secret SPICA_PROMOTION_KEY
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/gold.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+```
+
+3) Open PR and label `promotion` (CI guard verifies the bundle).
+
+### Kill-switch / Rollback
+Point dashboards at `configs/pipelines/current.yaml`. Then:
+
+```
+# promote candidate
+python tools/kill_switch.py --activate --target configs/pipelines/tags.yaml
+# rollback to baseline
+python tools/kill_switch.py --deactivate
+```
+
+### Per-domain task-KL overrides
+
+SPICA allows per-domain thresholds for task-drift KL (τ_t):
+
+```
+# global default (fallback)
+export SPICA_TAU_TASK=0.08
+
+# per-domain override: dots → underscores
+export SPICA_TAU_TASK__QA_RAG=0.12
+```
+
+The adapter resolves τ_t with the following precedence:
+
+1) `SPICA_TAU_TASK__<DOMAIN_UPPER_WITH_UNDERSCORES>`
+2) `SPICA_TAU_TASK`
+3) default `0.08`
+
+### Composite “promotion candidate” task
+
+Run shadow (with baseline) → build signed bundle in one click:
+
+- VS Code: Tasks → `promotion: candidate (gold+fresh)`
+
+Produces `shadow.metrics.json` and `promotion_unit.json` (signed).
+
+### Environment variables (reference)
+
+| Var                     | Meaning                                           | Example                        |
+|-------------------------|---------------------------------------------------|---------------------------------|
+| `SPICA_TAU_PERSONA`     | Persona KL hard gate                              | `0.02`                         |
+| `SPICA_TAU_TASK`        | Global task KL soft cap                           | `0.08`                         |
+| `SPICA_TAU_TASK__QA_RAG`| Per-domain task KL (domain `qa.rag`)              | `0.12`                         |
+| `SPICA_CAP_REG_PATH`    | Override capability registry path                 | `capability_registry.json`     |
+| `SPICA_TELEMETRY_PATH`  | Telemetry JSONL output                            | `spica.telemetry.jsonl`        |
+| `SPICA_PROMOTION_KEY`   | HMAC key for promotion unit signing (CI secret)   | `(hex / random 32+ bytes)`     |
+
+### Troubleshooting (promotion guard)
+
+Promotion guard fails?
+
+- Ensure `promotion_unit.json` is at repo root and signed.
+- Repo secret `SPICA_PROMOTION_KEY` is set.
+- PR is labeled `promotion`.
+- If the unit was modified post-signing, rebuild it.
+
+
+
+
 You can also `cat report.md` file which appeared in the project directory and contains the "report card" of the run, i.e. a bunch of evaluations and metrics. At the very end, you'll see a summary table, for example:
 
 ---
