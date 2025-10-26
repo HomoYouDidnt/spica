@@ -1,0 +1,67 @@
+{
+  "files.exclude": {
+    "**/.git": true,
+    "**/__pycache__": true,
+    "data": true,
+    "checkpoints": true,
+    "outputs": true,
+    "wandb": true,
+    "**/*.pt": true,
+    "**/*.bin": true,
+    "**/*.safetensors": true
+  },
+  "search.exclude": {
+    "**/.git": true,
+    "**/__pycache__": true,
+    "data/**": true,
+    "checkpoints/**": true,
+    "outputs/**": true,
+    "wandb/**": true
+  },
+  "python.analysis.typeCheckingMode": "basic",
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": ["-q", "--maxfail=1"],
+  "python.formatting.provider": "black",
+  "editor.formatOnSave": true,
+  "ruff.enable": true,
+  "ruff.lint.args": [],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit",
+    "source.fixAll.ruff": "explicit"
+  },
+
+  // ---- If your Codex extension exposes these knobs, use them; otherwise ignore. ----
+  "codex.projectName": "nanochat-spica",
+  "codex.context.include": [
+    "src/**",
+    "spica/**",
+    "scripts/**",
+    "configs/**",
+    "AGENTS.md",
+    "README.md"
+  ],
+  "codex.context.exclude": [
+    "**/.git/**",
+    "**/__pycache__/**",
+    "data/**",
+    "checkpoints/**",
+    "outputs/**",
+    "wandb/**",
+    "**/*.pt",
+    "**/*.bin",
+    "**/*.safetensors"
+  ],
+  "codex.sandbox.allowNetwork": false,
+  "codex.sandbox.writeScope": "repo",
+  "codex.sandbox.askBeforeWrite": true,
+  "codex.resources.maxCpuSeconds": 120,
+  "codex.resources.maxMemoryMb": 4096,
+
+  // Helpful (optional)
+  "terminal.integrated.env.linux": {
+    "PYTHONUNBUFFERED": "1",
+    "CUDA_VISIBLE_DEVICES": "",
+    "PIP_DISABLE_PIP_VERSION_CHECK": "1"
+  }
+}
