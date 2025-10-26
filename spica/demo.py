@@ -24,6 +24,7 @@ def main():
         "origin_commit": "WORKTREE",
         "domain": args.domain,
         "tokens_used": 0,
+        "seed": 42,
     }
     seed = {
         "text": "hello spica",
