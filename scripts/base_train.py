@@ -12,21 +12,31 @@ python -m scripts.base_train --depth=4 --max_seq_len=512 --device_batch_size=1 -
 """
 
 import os
+
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 import time
 from contextlib import nullcontext
 
-import wandb
 import torch
+import wandb
 
-from nanochat.gpt import GPT, GPTConfig
-from nanochat.dataloader import tokenizing_distributed_data_loader
-from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type
-from nanochat.tokenizer import get_tokenizer, get_token_bytes
 from nanochat.checkpoint_manager import save_checkpoint
-from nanochat.loss_eval import evaluate_bpb
+from nanochat.common import (
+    DummyWandb,
+    autodetect_device_type,
+    compute_cleanup,
+    compute_init,
+    get_base_dir,
+    print0,
+    print_banner,
+)
+from nanochat.dataloader import tokenizing_distributed_data_loader
 from nanochat.engine import Engine
+from nanochat.gpt import GPT, GPTConfig
+from nanochat.loss_eval import evaluate_bpb
+from nanochat.tokenizer import get_token_bytes, get_tokenizer
 from scripts.base_eval import evaluate_model
+
 print_banner()
 
 # -----------------------------------------------------------------------------
@@ -320,6 +330,7 @@ print0(f"Minimum validation bpb: {min_val_bpb:.4f}")
 
 # Log to report
 from nanochat.report import get_report
+
 get_report().log(section="Base model training", data=[
     user_config, # CLI args
     { # stats about the training setup

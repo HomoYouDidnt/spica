@@ -26,6 +26,13 @@ def main():
     for step in cfg["pipeline"]:
         cell = registry[step]
         result = cell.run(context, **(result or {"text": "hello spica"}))
+        # Optional: echo metrics
+        try:
+            m = result.get("_metrics", {}).get(cell.manifest.name)  # type: ignore[attr-defined]
+            if m:
+                print(f"[METRICS] {cell.manifest.name}: {m}")  # type: ignore[attr-defined]
+        except Exception:
+            pass
     print(result)
 
 

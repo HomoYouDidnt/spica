@@ -4,7 +4,9 @@ https://huggingface.co/datasets/allenai/ai2_arc
 """
 
 from datasets import load_dataset
+
 from tasks.common import Task, render_mc
+
 
 class ARC(Task):
 

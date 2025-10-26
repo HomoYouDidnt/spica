@@ -7,12 +7,13 @@ This file contains utilities for:
 For details of how the dataset was prepared, see `repackage_data_reference.py`.
 """
 
-import os
 import argparse
+import os
 import time
-import requests
-import pyarrow.parquet as pq
 from multiprocessing import Pool
+
+import pyarrow.parquet as pq
+import requests
 
 from nanochat.common import get_base_dir
 
@@ -78,7 +79,7 @@ def download_single_file(index):
             response = requests.get(url, stream=True, timeout=30)
             response.raise_for_status()
             # Write to temporary file first
-            temp_path = filepath + f".tmp"
+            temp_path = filepath + ".tmp"
             with open(temp_path, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024 * 1024):  # 1MB chunks
                     if chunk:
@@ -91,7 +92,7 @@ def download_single_file(index):
         except (requests.RequestException, IOError) as e:
             print(f"Attempt {attempt}/{max_attempts} failed for {filename}: {e}")
             # Clean up any partial files
-            for path in [filepath + f".tmp", filepath]:
+            for path in [filepath + ".tmp", filepath]:
                 if os.path.exists(path):
                     try:
                         os.remove(path)

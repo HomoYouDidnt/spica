@@ -3,8 +3,9 @@ Muon optimizer from Keller et al.
 Also a lot of borrowing of ideas from modded-nanogpt.
 """
 import torch
-from torch import Tensor
 import torch.distributed as dist
+from torch import Tensor
+
 
 @torch.compile
 def zeropower_via_newtonschulz5(G: Tensor, steps: int) -> Tensor:

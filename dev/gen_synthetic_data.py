@@ -28,12 +28,13 @@ NOTE: You need OpenRouter API key in a file called "openroutertoken.txt" in the 
       (obviously you can tune this arbitrarily to your liking)
 NOTE: For more details see this discussion: https://github.com/karpathy/nanochat/discussions/139
 """
-import requests
+import copy
 import json
 import os
-import copy
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import requests
 
 from nanochat.common import get_base_dir
 

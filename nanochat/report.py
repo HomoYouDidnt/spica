@@ -2,15 +2,17 @@
 Utilities for generating training report cards. More messy code than usual, will fix.
 """
 
+import datetime
 import os
+import platform
 import re
 import shutil
-import subprocess
 import socket
-import datetime
-import platform
+import subprocess
+
 import psutil
 import torch
+
 
 def run_command(cmd):
     """Run a shell command and return output, or None if it fails."""
@@ -354,7 +356,7 @@ class Report:
             else:
                 out_file.write("Total wall clock time: unknown\n")
         # also cp the report.md file to current directory
-        print(f"Copying report.md to current directory for convenience")
+        print("Copying report.md to current directory for convenience")
         shutil.copy(report_file, "report.md")
         return report_file
 

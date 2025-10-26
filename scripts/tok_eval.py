@@ -2,8 +2,8 @@
 Evaluate compression ratio of the tokenizer.
 """
 
-from nanochat.tokenizer import get_tokenizer, RustBPETokenizer
 from nanochat.dataset import parquets_iter_batched
+from nanochat.tokenizer import RustBPETokenizer, get_tokenizer
 
 # Random text I got from a random website this morning
 news_text = r"""
@@ -195,7 +195,7 @@ RED = '\033[91m'
 RESET = '\033[0m'
 
 # Print vocab sizes
-print(f"\nVocab sizes:")
+print("\nVocab sizes:")
 print(f"GPT-2: {vocab_sizes['gpt2']}")
 print(f"GPT-4: {vocab_sizes['gpt4']}")
 print(f"Ours: {vocab_sizes['ours']}")
@@ -244,6 +244,7 @@ print_comparison("GPT-4", tokenizer_results['gpt4'], tokenizer_results['ours'], 
 
 # Log to report
 from nanochat.report import get_report
+
 lines = []
 for baseline_name in ["GPT-2", "GPT-4"]:
     baseline_key = baseline_name.lower().replace('-', '')
