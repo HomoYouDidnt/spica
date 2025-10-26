@@ -1,0 +1,5 @@
+steps:
+  - name: uppercase
+  - name: echo
+  - name: ranker
+
