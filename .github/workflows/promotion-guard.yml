@@ -1,1 +1,27 @@
+name: promotion-guard
 
+on:
+  pull_request:
+    types: [opened, synchronize, labeled, reopened]
+
+jobs:
+  require-promotion-unit:
+    # Only run this guard if the PR is labeled "promotion"
+    if: contains(github.event.pull_request.labels.*.name, 'promotion')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Verify promotion unit
+        env:
+          # Add this secret in: Settings → Secrets and variables → Actions
+          SPICA_PROMOTION_KEY: ${{ secrets.SPICA_PROMOTION_KEY }}
+        run: |
+          test -f promotion_unit.json || (echo "::error ::promotion_unit.json missing at repo root"; exit 1)
+          python -c "from spica.promotions import verify_promotion_unit; import sys; sys.exit(0 if verify_promotion_unit('promotion_unit.json') else 1)"
