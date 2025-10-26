@@ -53,4 +53,3 @@ class CapabilityRegistry:
         fn = getattr(mod, s.entry)
         manifest = getattr(mod, s.manifest_attr)
         return fn, manifest, s
-

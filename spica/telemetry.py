@@ -27,4 +27,3 @@ def log_event(event: Dict[str, Any], path: Optional[str] = None) -> None:
     with _lock:
         with open(fp, "a", encoding="utf-8") as f:
             f.write(line + "\n")
-
