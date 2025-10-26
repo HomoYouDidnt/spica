@@ -227,6 +227,19 @@ qr.submit("explore:mutate@1",  lambda: None, priority=1)
 qr.run(budget_s=30.0)
 ```
 
+Submit a real shadow job from the queue:
+
+```python
+from tools.queue_runner import QueueRunner, submit_shadow_job
+qr = QueueRunner()
+submit_shadow_job(qr, name="eval:shadow@gold",
+                  pipeline="configs/pipelines/local.yaml",
+                  input_path="samples/gold.qarg.jsonl",
+                  out_path="baseline.shadow.metrics.json",
+                  limit=10000, priority=10)
+qr.run(budget_s=60.0)
+```
+
 
 
 

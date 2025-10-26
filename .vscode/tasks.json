@@ -73,6 +73,11 @@
       "label": "queue: demo",
       "type": "shell",
       "command": "python -c \"from tools.queue_runner import QueueRunner; q=QueueRunner(); q.submit('eval:shadow@gold', lambda: None, 10); q.submit('explore:mutate@1', lambda: None, 1); q.run(5.0)\""
+    },
+    {
+      "label": "queue: shadow (sample)",
+      "type": "shell",
+      "command": "python -c \"from tools.queue_runner import QueueRunner, submit_shadow_job; q=QueueRunner(); submit_shadow_job(q,name='eval:shadow@sample',pipeline='configs/pipelines/local.yaml',input_path='samples/sanitized.qarg.jsonl',out_path='shadow.metrics.json',limit=1000,priority=10); q.run(60)\""
     }
   ]
 }

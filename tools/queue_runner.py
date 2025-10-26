@@ -64,3 +64,52 @@ def demo_submit(runner: QueueRunner) -> None:
     runner.submit("eval:shadow@A", eval_job, priority=10)
     runner.submit("explore:mutate@1", explore_job, priority=1)
 
+import subprocess
+import sys
+from pathlib import Path
+
+
+def submit_shadow_job(
+    runner: QueueRunner,
+    *,
+    name: str,
+    pipeline: str,
+    input_path: str,
+    out_path: str,
+    baseline: str | None = None,
+    limit: int = 1000,
+    priority: int = 10,
+    python_exe: str | None = None,
+) -> None:
+    """
+    Submit a shadow_runner job:
+      - pipeline: capability-backed pipeline YAML
+      - input_path: sanitized transcripts JSONL
+      - baseline: optional baseline metrics JSON for Δ and CI
+      - out_path: destination metrics JSON
+    """
+    pipeline = str(Path(pipeline))
+    input_path = str(Path(input_path))
+    out_path = str(Path(out_path))
+    baseline = str(Path(baseline)) if baseline else None
+
+    def _job():
+        exe = python_exe or sys.executable
+        cmd = [
+            exe,
+            "tools/shadow_runner.py",
+            "--pipeline",
+            pipeline,
+            "--input",
+            input_path,
+            "--out",
+            out_path,
+            "--limit",
+            str(limit),
+        ]
+        if baseline:
+            cmd.extend(["--baseline", baseline])
+        print(f"[queue] run: {' '.join(cmd)}")
+        subprocess.check_call(cmd)
+
+    runner.submit(name, _job, priority=priority)
