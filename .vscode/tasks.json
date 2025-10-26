@@ -38,6 +38,11 @@
       "label": "tail telemetry",
       "type": "shell",
       "command": "type spica.telemetry.jsonl"
+    },
+    {
+      "label": "shadow (sample)",
+      "type": "shell",
+      "command": "python tools/shadow_runner.py --pipeline configs/pipelines/local.yaml --input samples/sanitized.qarg.jsonl --out shadow.metrics.json --limit 100"
     }
   ]
 }

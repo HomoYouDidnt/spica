@@ -1,0 +1,4 @@
+{"conv_id":"c1","turn":1,"role":"user","text":"say hello"}
+{"conv_id":"c1","turn":2,"role":"assistant","text":"HELLO SPICA","gold":"HELLO SPICA"}
+{"conv_id":"c2","turn":1,"role":"user","text":"pick best: hello spica vs moon","candidates":["hello spica","goodnight moon"],"query":"hello","gold":"hello spica"}
+
