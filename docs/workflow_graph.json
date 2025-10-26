@@ -1,0 +1,11 @@
+{
+  "nodes": ["validate", "demo", "shadow", "baseline", "bundle", "guard", "activate"],
+  "edges": [
+    ["validate", "demo"],
+    ["demo", "shadow"],
+    ["shadow", "baseline"],
+    ["baseline", "bundle"],
+    ["bundle", "guard"],
+    ["guard", "activate"]
+  ]
+}

@@ -1,0 +1,7 @@
+allowed:
+  - param_tuning
+  - structural_mutation
+  - domain_retarget
+forbidden:
+  - self_modification
+  - cross-domain contamination

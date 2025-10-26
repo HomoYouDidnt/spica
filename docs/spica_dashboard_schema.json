@@ -1,0 +1,3 @@
+{
+  "widgets": ["pipeline_status", "metrics_table", "promotion_log"]
+}

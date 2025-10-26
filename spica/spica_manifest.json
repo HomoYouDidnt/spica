@@ -1,0 +1,6 @@
+{
+  "system": "SPICA",
+  "version": "1.0.0",
+  "purpose": "Safe, auditable cognitive evolution under D-REAM",
+  "architecture": { "reference": "See full manifest in docs/spica_manifest.md" }
+}

@@ -1,0 +1,13 @@
+promotion_policy:
+  evidence_required: true
+  signature_required: true
+  rollback_supported: true
+
+safety_thresholds:
+  kl_persona: 0.02
+  kl_task_default: 0.08
+  domain_overrides: "SPICA_TAU_TASK__<DOMAIN>"
+
+budgets:
+  tokens_default: 64
+  sec_default: 5.0

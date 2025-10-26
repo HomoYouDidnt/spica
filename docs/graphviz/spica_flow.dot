@@ -1,0 +1,3 @@
+digraph SPICA {
+  validate -> demo -> shadow -> baseline -> bundle -> guard -> activate;
+}
