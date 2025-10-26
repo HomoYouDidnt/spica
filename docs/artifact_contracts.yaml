@@ -1,0 +1,12 @@
+shadow_metrics:
+  fields:
+    - answer_accuracy@1
+    - latency_p95_ms
+    - kl_persona
+    - kl_task
+promotion_unit:
+  fields:
+    - lineage
+    - signature
+    - metrics
+    - guardrails

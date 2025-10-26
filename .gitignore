@@ -6,3 +6,7 @@ dev-ignore/
 report.md
 eval_bundle/
 .cache/
+spica.telemetry.jsonl
+shadow.metrics.json
+baseline.shadow.metrics.json
+promotion_unit.json

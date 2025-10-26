@@ -1,0 +1,4 @@
+QA: ["accuracy", "precision"]
+RAG: ["relevance", "latency"]
+Planning: ["coherence", "success_rate"]
+Reasoning: ["truthfulness", "consistency"]

@@ -1,0 +1,5 @@
+{
+  "uppercase": {"domain": "transform", "goal": "Text normalization"},
+  "echo": {"domain": "transform", "goal": "Echo test"},
+  "ranker": {"domain": "rank", "goal": "Candidate scoring"}
+}
