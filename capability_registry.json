@@ -1,0 +1,32 @@
+{
+  "tools": [
+    {
+      "name": "uppercase",
+      "module": "spica.cells.uppercase",
+      "entry": "run",
+      "manifest_attr": "MANIFEST",
+      "tags": ["text", "transform"],
+      "risk_class": "low",
+      "budgets": {"tokens": 0, "sec": 0.05}
+    },
+    {
+      "name": "echo",
+      "module": "spica.cells.echo",
+      "entry": "run",
+      "manifest_attr": "MANIFEST",
+      "tags": ["text", "debug"],
+      "risk_class": "low",
+      "budgets": {"tokens": 0, "sec": 0.02}
+    },
+    {
+      "name": "ranker",
+      "module": "spica.cells.ranker",
+      "entry": "run",
+      "manifest_attr": "MANIFEST",
+      "tags": ["text", "rank"],
+      "risk_class": "low",
+      "budgets": {"tokens": 0, "sec": 0.05}
+    }
+  ]
+}
+

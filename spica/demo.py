@@ -1,6 +1,8 @@
 import argparse
 import importlib
+import os
 import sys
+from typing import Any, Dict
 
 import yaml
 
@@ -18,6 +20,9 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--cells", default="configs/cells/local.yaml")
     args = ap.parse_args()
+    print(
+        f"[TELEMETRY] → {os.environ.get('SPICA_TELEMETRY_PATH','spica.telemetry.jsonl')}"
+    )
     with open(args.cells, "r") as f:
         cfg = yaml.safe_load(f)
     registry = dict(load_cell(c) for c in cfg["cells"])

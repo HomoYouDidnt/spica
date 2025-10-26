@@ -37,6 +37,23 @@ class CellAdapter:
             pass
         if self.metrics_sink:
             self.metrics_sink(self.manifest.name, m.to_dict())
+        # fire-and-forget telemetry
+        try:
+            from .telemetry import log_event
+
+            log_event(
+                {
+                    "variant_id": context.get("variant_id"),
+                    "parent_id": context.get("parent_id"),
+                    "origin_commit": context.get("origin_commit"),
+                    "cell": self.manifest.name,
+                    "latency_ms": m.latency_ms,
+                    "ok": m.ok,
+                    "error": m.error,
+                }
+            )
+        except Exception:
+            pass
         if isinstance(out, dict):
             merged = {}
             if isinstance(context.get("_metrics"), dict):
