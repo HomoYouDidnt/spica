@@ -160,6 +160,63 @@ python tools/build_promotion_unit.py \
 
 3) Open PR and label `promotion` (CI guard verifies the bundle).
 
+### Kill-switch / Rollback
+Point dashboards at `configs/pipelines/current.yaml`. Then:
+
+```
+# promote candidate
+python tools/kill_switch.py --activate --target configs/pipelines/tags.yaml
+# rollback to baseline
+python tools/kill_switch.py --deactivate
+```
+
+### Per-domain task-KL overrides
+
+SPICA allows per-domain thresholds for task-drift KL (τ_t):
+
+```
+# global default (fallback)
+export SPICA_TAU_TASK=0.08
+
+# per-domain override: dots → underscores
+export SPICA_TAU_TASK__QA_RAG=0.12
+```
+
+The adapter resolves τ_t with the following precedence:
+
+1) `SPICA_TAU_TASK__<DOMAIN_UPPER_WITH_UNDERSCORES>`
+2) `SPICA_TAU_TASK`
+3) default `0.08`
+
+### Composite “promotion candidate” task
+
+Run shadow (with baseline) → build signed bundle in one click:
+
+- VS Code: Tasks → `promotion: candidate (gold+fresh)`
+
+Produces `shadow.metrics.json` and `promotion_unit.json` (signed).
+
+### Environment variables (reference)
+
+| Var                     | Meaning                                           | Example                        |
+|-------------------------|---------------------------------------------------|---------------------------------|
+| `SPICA_TAU_PERSONA`     | Persona KL hard gate                              | `0.02`                         |
+| `SPICA_TAU_TASK`        | Global task KL soft cap                           | `0.08`                         |
+| `SPICA_TAU_TASK__QA_RAG`| Per-domain task KL (domain `qa.rag`)              | `0.12`                         |
+| `SPICA_CAP_REG_PATH`    | Override capability registry path                 | `capability_registry.json`     |
+| `SPICA_TELEMETRY_PATH`  | Telemetry JSONL output                            | `spica.telemetry.jsonl`        |
+| `SPICA_PROMOTION_KEY`   | HMAC key for promotion unit signing (CI secret)   | `(hex / random 32+ bytes)`     |
+
+### Troubleshooting (promotion guard)
+
+Promotion guard fails?
+
+- Ensure `promotion_unit.json` is at repo root and signed.
+- Repo secret `SPICA_PROMOTION_KEY` is set.
+- PR is labeled `promotion`.
+- If the unit was modified post-signing, rebuild it.
+
+
 
 
 You can also `cat report.md` file which appeared in the project directory and contains the "report card" of the run, i.e. a bunch of evaluations and metrics. At the very end, you'll see a summary table, for example:
