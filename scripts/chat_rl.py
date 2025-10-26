@@ -16,15 +16,15 @@ python -m scripts.chat_rl
 torchrun --standalone --nproc_per_node=8 -m scripts.chat_rl -- --run=default
 """
 
-import os
 import itertools
-import re
-import wandb
+import os
+
 import torch
 import torch.distributed as dist
+import wandb
 
-from nanochat.common import compute_init, compute_cleanup, print0, get_base_dir, DummyWandb
-from nanochat.checkpoint_manager import save_checkpoint, load_model
+from nanochat.checkpoint_manager import load_model, save_checkpoint
+from nanochat.common import DummyWandb, compute_cleanup, compute_init, get_base_dir, print0
 from nanochat.engine import Engine
 from tasks.gsm8k import GSM8K
 
@@ -323,6 +323,7 @@ for step in range(num_steps):
 
 # Log to report
 from nanochat.report import get_report
+
 get_report().log(section="Chat RL", data=[
     user_config, # CLI args
 ])

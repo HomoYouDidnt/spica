@@ -11,14 +11,17 @@ Notes:
 The whole thing is made as efficient as possible.
 """
 
-import torch
-import torch.nn.functional as F
 import signal
 import warnings
-from contextlib import contextmanager
 from collections import deque
-from nanochat.common import compute_init
+from contextlib import contextmanager
+
+import torch
+import torch.nn.functional as F
+
 from nanochat.checkpoint_manager import load_model
+from nanochat.common import compute_init
+
 
 # -----------------------------------------------------------------------------
 # Calculator tool helpers
@@ -38,7 +41,7 @@ def eval_with_timeout(formula, max_time=3):
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", SyntaxWarning)
                 return eval(formula)
-    except Exception as e:
+    except Exception:
         signal.alarm(0)
         # print(f"Warning: Failed to eval {formula}, exception: {e}") # it's ok ignore wrong calculator usage
         return None

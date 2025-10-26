@@ -33,7 +33,11 @@
           "PYTHONPATH": "${workspaceFolder}"
         }
       }
+    },
+    {
+      "label": "tail telemetry",
+      "type": "shell",
+      "command": "type spica.telemetry.jsonl"
     }
   ]
 }
-

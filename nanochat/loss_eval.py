@@ -2,8 +2,10 @@
 A number of functions that help with evaluating a base model.
 """
 import math
+
 import torch
 import torch.distributed as dist
+
 
 @torch.no_grad()
 def evaluate_bpb(model, batches, steps, token_bytes):

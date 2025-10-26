@@ -26,10 +26,11 @@ To preview a few example conversations, run:
 python -m tasks.spellingbee
 """
 
-import re
 import random
-from tasks.common import Task
+import re
+
 from nanochat.common import download_file_with_lock
+from tasks.common import Task
 
 # Letters of the alphabet
 LETTERS = "abcdefghijklmnopqrstuvwxyz"

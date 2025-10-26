@@ -9,25 +9,26 @@ Or torchrun for training:
 torchrun --standalone --nproc_per_node=8 -m scripts.mid_train -- --device_batch_size=16
 """
 
-from collections import deque
 import os
+from collections import deque
+
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 import time
-import wandb
-import torch
 from contextlib import nullcontext
-from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, get_base_dir, autodetect_device_type
-from nanochat.tokenizer import get_token_bytes
-from nanochat.checkpoint_manager import save_checkpoint
-from nanochat.loss_eval import evaluate_bpb
-from nanochat.checkpoint_manager import load_model
-import torch.distributed as dist
 
+import torch
+import torch.distributed as dist
+import wandb
+
+from nanochat.checkpoint_manager import load_model, save_checkpoint
+from nanochat.common import DummyWandb, autodetect_device_type, compute_cleanup, compute_init, get_base_dir, print0
+from nanochat.loss_eval import evaluate_bpb
+from nanochat.tokenizer import get_token_bytes
 from tasks.common import TaskMixture
+from tasks.customjson import CustomJSON
 from tasks.gsm8k import GSM8K
 from tasks.mmlu import MMLU
 from tasks.smoltalk import SmolTalk
-from tasks.customjson import CustomJSON
 from tasks.spellingbee import SimpleSpelling, SpellingBee
 
 # -----------------------------------------------------------------------------

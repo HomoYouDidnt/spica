@@ -10,24 +10,24 @@ torchrun --standalone --nproc_per_node=8 -m scripts.chat_sft
 """
 
 import os
+
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-import wandb
-import torch
-import torch.distributed as dist
 from contextlib import nullcontext
 
-from nanochat.common import compute_init, compute_cleanup, get_base_dir, print0, DummyWandb, autodetect_device_type
-from nanochat.checkpoint_manager import load_model
-from nanochat.checkpoint_manager import save_checkpoint
+import torch
+import torch.distributed as dist
+import wandb
+
+from nanochat.checkpoint_manager import load_model, save_checkpoint
+from nanochat.common import DummyWandb, autodetect_device_type, compute_cleanup, compute_init, get_base_dir, print0
 from nanochat.engine import Engine
 from scripts.chat_eval import run_chat_eval
-
-from tasks.common import TaskMixture
 from tasks.arc import ARC
+from tasks.common import TaskMixture
+from tasks.customjson import CustomJSON
 from tasks.gsm8k import GSM8K
 from tasks.smoltalk import SmolTalk
-from tasks.customjson import CustomJSON
 from tasks.spellingbee import SimpleSpelling, SpellingBee
 
 # -----------------------------------------------------------------------------
@@ -270,6 +270,7 @@ if master_process:
 
 # Log to report
 from nanochat.report import get_report
+
 get_report().log(section="Chat SFT", data=[
     user_config, # CLI args
     {
