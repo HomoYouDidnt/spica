@@ -1,0 +1,9 @@
+{
+  "trace_id": "Unique run identifier",
+  "variant_id": "Cell or variant name",
+  "latency_ms": "Step latency",
+  "ok": "Boolean success flag",
+  "error": "Error string or null",
+  "tau_persona": "KL-persona drift",
+  "tau_task": "KL-task drift"
+}
