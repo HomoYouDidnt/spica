@@ -1,0 +1,18 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "setup", "type": "shell", "command": "uv sync || pip install -e .[dev]" },
+    { "label": "lint",  "type": "shell", "command": "ruff check . && black --check ." },
+    { "label": "fix",   "type": "shell", "command": "ruff check . --fix && black ." },
+    { "label": "test",  "type": "shell", "command": "pytest -q --maxfail=1" },
+    { "label": "run demo", "type": "shell", "command": "python -m spica.demo --cells configs/cells/local.yaml" },
+    { "label": "bench", "type": "shell", "command": "python scripts/bench_cells.py --suite configs/suites/dev.yaml" },
+
+    // Fast “all checks” compound task
+    {
+      "label": "validate",
+      "dependsOn": ["lint", "test"],
+      "dependsOrder": "sequence"
+    }
+  ]
+}
