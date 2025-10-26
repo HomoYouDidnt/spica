@@ -110,6 +110,28 @@ python tools/build_promotion_unit.py \
 python -c "from spica.promotions import verify_promotion_unit as v; import sys; sys.exit(0 if v('promotion_unit.json') else 1)"
 ```
 
+### Baseline from Gold Shard
+Create a stable baseline for Δacc@1 CIs:
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/gold.qarg.jsonl \
+  --out baseline.shadow.metrics.json \
+  --limit 10000
+```
+
+Use it in evaluations:
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --baseline baseline.shadow.metrics.json \
+  --out shadow.metrics.json --limit 1000
+```
+
+
 You can also `cat report.md` file which appeared in the project directory and contains the "report card" of the run, i.e. a bunch of evaluations and metrics. At the very end, you'll see a summary table, for example:
 
 ---

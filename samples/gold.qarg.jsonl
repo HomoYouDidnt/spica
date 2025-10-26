@@ -1,0 +1,26 @@
+{"conv_id":"g1","turn":1,"role":"user","text":"say hello"}
+{"conv_id":"g1","turn":2,"role":"assistant","gold":"HELLO SPICA"}
+
+{"conv_id":"g2","turn":1,"role":"user","text":"pick best","candidates":["hello spica","goodnight moon"],"query":"hello","gold":"hello spica"}
+
+{"conv_id":"g3","turn":1,"role":"user","text":" HeLLo   spica  "}
+{"conv_id":"g3","turn":2,"role":"assistant","gold":"HELLO SPICA"}
+
+{"conv_id":"g4","turn":1,"role":"user","text":"pick best: moon vs spica","candidates":["goodnight moon","hello spica"],"query":"spica","gold":"hello spica"}
+
+{"conv_id":"g5","turn":1,"role":"user","text":""}
+{"conv_id":"g5","turn":2,"role":"assistant","gold":""}
+
+{"conv_id":"g6","turn":1,"role":"user","text":"hello spica  "}
+{"conv_id":"g6","turn":2,"role":"assistant","gold":"HELLO SPICA"}
+
+{"conv_id":"g7","turn":1,"role":"user","text":"choose","candidates":["HELLO SPICA","moon"],"query":"hello","gold":"HELLO SPICA"}
+
+{"conv_id":"g8","turn":1,"role":"user","text":"greet me like a bot"}
+{"conv_id":"g8","turn":2,"role":"assistant","gold":"HELLO SPICA"}
+
+{"conv_id":"g9","turn":1,"role":"user","text":"rank please","candidates":["moon","hello spica"],"query":"hello","gold":"hello spica"}
+
+{"conv_id":"g10","turn":1,"role":"user","text":"  spica says hi"}
+{"conv_id":"g10","turn":2,"role":"assistant","gold":"HELLO SPICA"}
+
