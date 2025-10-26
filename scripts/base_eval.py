@@ -9,21 +9,20 @@ torchrun --nproc_per_node=8 base_eval.py
 
 The script will print the CORE metric to the console.
 """
-import os
-import sys
-import time
 import json
+import os
 import random
-import yaml
+import time
 from contextlib import nullcontext
 
 import pandas as pd
 import torch
+import yaml
 
-from nanochat.common import compute_init, compute_cleanup, print0, get_base_dir, autodetect_device_type
-from nanochat.tokenizer import HuggingFaceTokenizer
 from nanochat.checkpoint_manager import load_model
+from nanochat.common import autodetect_device_type, compute_cleanup, compute_init, get_base_dir, print0
 from nanochat.core_eval import evaluate_task
+from nanochat.tokenizer import HuggingFaceTokenizer
 
 # -----------------------------------------------------------------------------
 # nanoChat specific function dealing with I/O etc.

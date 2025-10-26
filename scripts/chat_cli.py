@@ -5,11 +5,13 @@ Intended to be run single GPU only atm:
 python -m scripts.chat_cli -i mid
 """
 import argparse
-import torch
-from nanochat.common import compute_init, autodetect_device_type
 from contextlib import nullcontext
-from nanochat.engine import Engine
+
+import torch
+
 from nanochat.checkpoint_manager import load_model
+from nanochat.common import autodetect_device_type, compute_init
+from nanochat.engine import Engine
 
 parser = argparse.ArgumentParser(description='Chat with the model')
 parser.add_argument('-i', '--source', type=str, default="sft", help="Source of the model: sft|mid|rl")

@@ -1,0 +1,20 @@
+cells:
+  - id: upper
+    module: spica.cells.uppercase
+    entry: run
+    manifest_attr: MANIFEST
+
+  - id: echo
+    module: spica.cells.echo
+    entry: run
+    manifest_attr: MANIFEST
+
+  - id: rank
+    module: spica.cells.ranker
+    entry: run
+    manifest_attr: MANIFEST
+
+pipeline:
+  - upper
+  - echo
+  - rank

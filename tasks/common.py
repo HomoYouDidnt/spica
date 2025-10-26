@@ -7,6 +7,7 @@ Example tasks: MMLU, ARC-Easy, ARC-Challenge, GSM8K, HumanEval, SmolTalk.
 
 import random
 
+
 class Task:
     """
     Base class of a Task. Allows for lightweight slicing of the underlying dataset.

@@ -31,22 +31,23 @@ Abuse Prevention:
 """
 
 import argparse
-import json
-import os
-import torch
 import asyncio
+import json
 import logging
+import os
 import random
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, nullcontext
+from dataclasses import dataclass
+from typing import AsyncGenerator, List, Optional
+
+import torch
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse, HTMLResponse, FileResponse
+from fastapi.responses import FileResponse, HTMLResponse, StreamingResponse
 from pydantic import BaseModel
-from typing import List, Optional, AsyncGenerator
-from dataclasses import dataclass
-from contextlib import nullcontext
-from nanochat.common import compute_init, autodetect_device_type
+
 from nanochat.checkpoint_manager import load_model
+from nanochat.common import autodetect_device_type, compute_init
 from nanochat.engine import Engine
 
 # Abuse prevention limits
@@ -410,6 +411,6 @@ async def stats():
 
 if __name__ == "__main__":
     import uvicorn
-    print(f"Starting NanoChat Web Server")
+    print("Starting NanoChat Web Server")
     print(f"Temperature: {args.temperature}, Top-k: {args.top_k}, Max tokens: {args.max_tokens}")
     uvicorn.run(app, host=args.host, port=args.port)

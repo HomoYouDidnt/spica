@@ -2,13 +2,15 @@
 Train a tokenizer using the HuggingFace Tokenizers library.
 In the style of GPT-4 tokenizer.
 """
+import argparse
 import os
 import time
-import argparse
+
 import torch
-from nanochat.tokenizer import RustBPETokenizer
+
 from nanochat.common import get_base_dir
 from nanochat.dataset import parquets_iter_batched
+from nanochat.tokenizer import RustBPETokenizer
 
 # -----------------------------------------------------------------------------
 # Parse command line arguments
@@ -92,6 +94,7 @@ print(f"Saved token_bytes to {token_bytes_path}")
 
 # Log to report
 from nanochat.report import get_report
+
 token_bytes_nonzero = (token_bytes[token_bytes > 0]).to(dtype=torch.float32)
 get_report().log(section="Tokenizer training", data=[
     vars(args), # argparse command line arguments
