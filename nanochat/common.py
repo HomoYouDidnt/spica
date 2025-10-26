@@ -2,13 +2,20 @@
 Common utilities for nanochat.
 """
 
+import logging
 import os
 import re
-import logging
-import fcntl
+
+try:
+    # POSIX-only; optional for cross-platform support
+    import fcntl  # type: ignore
+except Exception:  # pragma: no cover - Windows or restricted envs
+    fcntl = None  # fall back to no-op locking on non-POSIX systems
 import urllib.request
+
 import torch
 import torch.distributed as dist
+
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter that adds colors to log messages."""
@@ -72,9 +79,13 @@ def download_file_with_lock(url, filename):
 
     with open(lock_path, 'w') as lock_file:
 
-        # Only a single rank can acquire this lock
-        # All other ranks block until it is released
-        fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        # Only a single rank can acquire this lock on POSIX; best-effort elsewhere
+        if fcntl is not None:
+            try:
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+            except Exception:
+                # On platforms without flock or if it fails, proceed without locking
+                pass
 
         if os.path.exists(file_path):
             return file_path

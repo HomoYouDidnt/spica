@@ -1,18 +1,39 @@
 {
   "version": "2.0.0",
   "tasks": [
-    { "label": "setup", "type": "shell", "command": "uv sync || pip install -e .[dev]" },
-    { "label": "lint",  "type": "shell", "command": "ruff check . && black --check ." },
-    { "label": "fix",   "type": "shell", "command": "ruff check . --fix && black ." },
-    { "label": "test",  "type": "shell", "command": "pytest -q --maxfail=1" },
-    { "label": "run demo", "type": "shell", "command": "python -m spica.demo --cells configs/cells/local.yaml" },
-    { "label": "bench", "type": "shell", "command": "python scripts/bench_cells.py --suite configs/suites/dev.yaml" },
-
-    // Fast “all checks” compound task
+    {
+      "label": "setup",
+      "type": "shell",
+      "command": "uv sync --dev --extra cpu"
+    },
+    {
+      "label": "lint",
+      "type": "shell",
+      "command": "uvx ruff check ."
+    },
     {
       "label": "validate",
-      "dependsOn": ["lint", "test"],
-      "dependsOrder": "sequence"
+      "type": "shell",
+      "command": "uvx ruff check . && uvx black --check spica && uv run pytest -q --maxfail=1",
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "NANOCHAT_BASE_DIR": "${workspaceFolder}/.cache/nanochat",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
+    },
+    {
+      "label": "run demo",
+      "type": "shell",
+      "command": "uv run python -m spica.demo --cells configs/cells/local.yaml",
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     }
   ]
 }
+
