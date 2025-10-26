@@ -131,6 +131,36 @@ python tools/shadow_runner.py \
   --out shadow.metrics.json --limit 1000
 ```
 
+### From Baseline to Promotion
+
+Once a stable baseline exists, every promotion candidate should:
+
+1) Shadow on fresh data (with baseline for Δ and CI):
+
+```
+python tools/shadow_runner.py \
+  --pipeline configs/pipelines/local.yaml \
+  --input samples/sanitized.qarg.jsonl \
+  --baseline baseline.shadow.metrics.json \
+  --out shadow.metrics.json --limit 1000
+```
+
+2) Build a signed bundle (evidence):
+
+```
+# local dev key; in CI use Actions secret SPICA_PROMOTION_KEY
+python tools/build_promotion_unit.py \
+  --variant-id spica_dev --baseline-id prod_2025-10-20 \
+  --pipeline configs/pipelines/local.yaml \
+  --metrics shadow.metrics.json \
+  --datasets '{"gold":"samples/gold.qarg.jsonl","fresh":"samples/sanitized.qarg.jsonl"}' \
+  --guardrails '{"kl_persona":0.01,"kl_task":0.04,"violations":0}' \
+  --mutation-vector '[]' --env-hash dev --out promotion_unit.json
+```
+
+3) Open PR and label `promotion` (CI guard verifies the bundle).
+
+
 
 You can also `cat report.md` file which appeared in the project directory and contains the "report card" of the run, i.e. a bunch of evaluations and metrics. At the very end, you'll see a summary table, for example:
 
