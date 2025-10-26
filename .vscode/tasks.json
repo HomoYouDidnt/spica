@@ -42,27 +42,120 @@
     {
       "label": "shadow (sample)",
       "type": "shell",
-      "command": "uv"
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "tools/shadow_runner.py",
+        "--pipeline",
+        "configs/pipelines/local.yaml",
+        "--input",
+        "samples/sanitized.qarg.jsonl",
+        "--out",
+        "shadow.metrics.json",
+        "--limit",
+        "100"
+      ],
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     },
     {
       "label": "promotion: build (sample)",
       "type": "shell",
-      "command": "uv"
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "tools/build_promotion_unit.py",
+        "--variant-id",
+        "spica_dev",
+        "--baseline-id",
+        "prod_2025-10-20",
+        "--pipeline",
+        "configs/pipelines/local.yaml",
+        "--metrics",
+        "shadow.metrics.json",
+        "--datasets",
+        "{\"gold\":\"samples/sanitized.qarg.jsonl\",\"fresh\":\"samples/sanitized.qarg.jsonl\"}",
+        "--guardrails",
+        "{\"kl_persona\":0.01,\"kl_task\":0.04,\"violations\":0}",
+        "--mutation-vector",
+        "[]",
+        "--env-hash",
+        "dev",
+        "--out",
+        "promotion_unit.json"
+      ],
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     },
     {
       "label": "baseline (gold)",
       "type": "shell",
-      "command": "uv"
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "tools/shadow_runner.py",
+        "--pipeline",
+        "configs/pipelines/local.yaml",
+        "--input",
+        "samples/gold.qarg.jsonl",
+        "--out",
+        "baseline.shadow.metrics.json",
+        "--limit",
+        "10000"
+      ],
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     },
     {
       "label": "pipeline: activate (tags)",
       "type": "shell",
-      "command": "uv"
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "tools/kill_switch.py",
+        "--activate",
+        "--target",
+        "configs/pipelines/tags.yaml"
+      ],
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     },
     {
       "label": "pipeline: rollback (baseline)",
       "type": "shell",
-      "command": "uv"
+      "command": "uv",
+      "args": [
+        "run",
+        "python",
+        "tools/kill_switch.py",
+        "--deactivate"
+      ],
+      "options": {
+        "env": {
+          "PYTHONUTF8": "1",
+          "PYTHONPATH": "${workspaceFolder}"
+        }
+      }
     },
     {
       "label": "promotion: candidate (gold+fresh)",
